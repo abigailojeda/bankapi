@@ -29,7 +29,6 @@ app.use('/users', createUserRouter({ UserModel }));
 app.use('/accounts', createAccountRouter({ AccountModel }));
 app.use('/transactions', createTransactionRouter({ TransactionModel }));
 
-// Root typeDefs
 const rootTypeDefs = gql`
   type Query {
     hello: String
@@ -87,12 +86,11 @@ async function startApolloServer() {
     }
   );
 
-  // Start listening
   const PORT = process.env.PORT || 7000;
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`GraphQL endpoint at http://localhost:${PORT}/graphql`);
-    console.log(`Subscriptions ready at ws://localhost:${PORT}/graphql`);
+    console.log(`GraphQL endpoint available at /graphql`);
+    console.log(`Subscriptions available at /graphql`);
   });
 }
 
