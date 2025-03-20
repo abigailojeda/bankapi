@@ -1,0 +1,25 @@
+{
+  "name": "bankapi",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch --env-file=.env index.js",
+    "start": "node index.js"
+  },
+  "author": "abigail",
+  "license": "ISC",
+  "dependencies": {
+    "@graphql-tools/merge": "^9.0.24",
+    "@graphql-tools/schema": "^10.0.23",
+    "apollo-server-express": "^3.13.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "graphql": "^16.10.0",
+    "graphql-subscriptions": "^3.0.0",
+    "pg": "^8.14.0",
+    "subscriptions-transport-ws": "^0.11.0"
+  }
+}
