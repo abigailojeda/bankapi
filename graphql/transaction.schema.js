@@ -95,7 +95,7 @@ export function createTransactionResolvers(pubsub) {
         const account = await AccountModel.getAccountById(accountId);
 
         let newBalance;
-        console.log(type);
+
         if (type === 'deposit')
           newBalance = account.current_balance + amount;
         else if (type === 'withdrawal')
@@ -163,7 +163,7 @@ export function createTransactionResolvers(pubsub) {
 
           pubsub.publish(TRANSACTION_CHANGED, {
             transactionChanged: {
-              changeType: 'UPDATED',
+              changeType: 'VOIDED',
               transaction: resultTx,
             },
           });
@@ -196,7 +196,7 @@ export function createTransactionResolvers(pubsub) {
 
         pubsub.publish(TRANSACTION_CHANGED, {
           transactionChanged: {
-            changeType: 'CREATED',
+            changeType: 'UNDONE',
             transaction: resultTx,
           },
         });
