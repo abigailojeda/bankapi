@@ -18,6 +18,7 @@ import { cardTypeDefs, cardResolvers } from './graphql/card.schema.js';
 import { createUserRouter } from './routes/user.router.js';
 import { createAccountRouter } from './routes/account.router.js';
 import { createTransactionRouter } from './routes/transaction.router.js';
+import { userResolvers, userTypeDefs } from './graphql/user.schema.js';
 
 const pubsub = new PubSub();
 console.log(pubsub.asyncIterableIterator);
@@ -51,12 +52,14 @@ const typeDefs = [
   transactionTypeDefs,
   cardTypeDefs,
   accountTypeDefs,
+  userTypeDefs
 ];
 const resolvers = [
   rootResolvers,
   createTransactionResolvers(pubsub),
   cardResolvers,
   accountResolvers,
+  userResolvers
 ];
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
