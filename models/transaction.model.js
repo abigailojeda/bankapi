@@ -26,11 +26,11 @@ class TransactionModel {
         return response.rows;
     }
 
-    static async createTransaction(transaction) {
+    static async createTransaction(transaction, newBalance) {
         const { account_id, date, amount, type, description, currency } = transaction;
         console.log(transaction);
-        const query = 'INSERT INTO transactions (account_id, date, amount, type, description, currency) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
-        const response = await dbConnection.query(query, [account_id, date, amount, type, description, currency]);
+        const query = 'INSERT INTO transactions (account_id, date, amount, type, description, currency, current_balance) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
+        const response = await dbConnection.query(query, [account_id, date, amount, type, description, currency, newBalance]);
         return response.rows[0];
     }
 

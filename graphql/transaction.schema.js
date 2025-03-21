@@ -19,6 +19,7 @@ export const transactionTypeDefs = gql`
     description: String
     currency: String
     updatedBalance: Float
+    current_balance: Float
   }
 
   type TransactionChangePayload {
@@ -103,8 +104,8 @@ export function createTransactionResolvers(pubsub) {
         else
           throw new Error('Invalid transaction type');
 
-        const createdTx = await TransactionModel.createTransaction(newTx);
-
+        const createdTx = await TransactionModel.createTransaction(newTx, newBalance);
+        
         const updatedAccount = await AccountModel.updateBalance(accountId, {
           current_balance: newBalance,
         });
