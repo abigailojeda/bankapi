@@ -1,6 +1,8 @@
 import { gql } from 'apollo-server-express';
 import AccountModel from '../models/account.model.js';
 
+const CURRENCY_CHANGED = 'CURRENCY_CHANGED';
+
 export const accountTypeDefs = gql`
 type Account {
     id: ID!
@@ -10,7 +12,12 @@ type Account {
     current_balance: Float!
 }
 
-type Query {
+type CurrencyChangePayload {
+    id: ID!
+    currency: String!
+}
+
+extend type Query {
     # Devuelve todas las cuentas de la tabla
     accounts: [Account!]!
 
@@ -32,38 +39,48 @@ type Mutation {
     updateCurrency(
         id: ID!
         currency: String!
+        current_balance: Float!
     ): Account!
+
+}
+
+type Subscription {
+    currencyChanged: CurrencyChangePayload!
 }
 `;
 
-export const accountResolvers = {
-    Query: {
-        // Usa el método getAccounts() de tu AccountModel
-        accounts: async () => {
-            return AccountModel.getAccounts();
+export function createAccountResolvers(pubsub) {
+    return {
+        Query: {
+            accounts: async () => {
+                return AccountModel.getAccounts();
+            },
+
+            account: async (_, { id }) => {
+                return AccountModel.getAccountById(id);
+            },
+
+            accountsByUserId: async (_, { userId }) => {
+                return AccountModel.getAccountsByUserId(userId);
+            },
         },
 
-        // Usa el método getAccountById(id)
-        account: async (_, { id }) => {
-            return AccountModel.getAccountById(id);
-        },
+        Mutation: {
+            updateCurrency: async (_, { id, currency, current_balance }) => {
+                const updatedAccount = await AccountModel.updateCurrency(id, currency.toUpperCase(), current_balance);
+                const response = { id, currency: updatedAccount.currency, current_balance: updatedAccount.current_balance };
+                
+                pubsub.publish(CURRENCY_CHANGED, {
+                    currencyChanged: response,
+                });
 
-        // Usa el método getAccountsByUserId(userId)
-        accountsByUserId: async (_, { userId }) => {
-            return AccountModel.getAccountsByUserId(userId);
+                return response;
+            },
         },
-    },
-
-    Mutation: {
-        // Usa el método updateBalance(id, account)
-        updateBalance: async (_, { id, account }) => {
-            return AccountModel.updateBalance(id, account);
-        },
-
-        // Usa el método updateCurrency(id, account)
-        updateCurrency: async (_, { id, account }) => {
-            return AccountModel.updateCurrency(id, account);
-        },
-    },
-
-};
+        Subscription: {
+            currencyChanged: {
+              subscribe: () => pubsub.asyncIterableIterator(CURRENCY_CHANGED),
+            },
+          },
+    };
+}

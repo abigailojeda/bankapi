@@ -27,10 +27,9 @@ class AccountModel {
         return response.rows[0];
     }
 
-    static async updateCurrency(id, account) {
-        const { currency } = account;
-        const query = 'UPDATE accounts_data SET currency = $1 WHERE id = $2 RETURNING *';
-        const response = await dbConnection.query(query, [currency, id]);
+    static async updateCurrency(id, currency, current_balance) {
+        const query = 'UPDATE accounts_data SET currency = $1, current_balance = $2 WHERE id = $3 RETURNING *';
+        const response = await dbConnection.query(query, [currency, current_balance, id]);
         return response.rows[0];
     }
 }

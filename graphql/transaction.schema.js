@@ -43,7 +43,6 @@ export const transactionTypeDefs = gql`
       date: String
       type: String
       description: String
-      currency: String
     ): Transaction!
 
     updateTransaction(
@@ -83,17 +82,18 @@ export function createTransactionResolvers(pubsub) {
     Mutation: {
       createTransaction: async (
         _,
-        { accountId, amount, date, type, description, currency }
+        { accountId, amount, date, type, description }
       ) => {
+        const account = await AccountModel.getAccountById(accountId);
+        
         const newTx = {
           account_id: accountId,
           amount,
           date,
           type,
           description,
-          currency,
+          currency: account.currency,
         };
-        const account = await AccountModel.getAccountById(accountId);
 
         let newBalance;
 

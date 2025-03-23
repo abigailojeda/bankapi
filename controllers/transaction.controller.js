@@ -36,7 +36,6 @@ class TransactionController {
     async createTransaction(req, res) {
         try {
             const transaction = req.body;
-            console.log("ghfgh", req);
             const newTransaction = await this.transactionModel.createTransaction(transaction);
             return res.status(201).json(newTransaction);
         } catch (error) {
