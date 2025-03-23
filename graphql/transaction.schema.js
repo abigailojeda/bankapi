@@ -8,6 +8,8 @@ export const transactionTypeDefs = gql`
   enum TransactionChangeType {
     CREATED
     UPDATED
+    VOIDED
+    UNDONE
   }
 
   type Transaction {
@@ -133,7 +135,7 @@ export function createTransactionResolvers(pubsub) {
           date,
           type,
           description,
-          currency,
+          currency: currency || oldTx.currency,
         });
 
         const account = await AccountModel.getAccountById(updatedTx.account_id);
@@ -176,7 +178,7 @@ export function createTransactionResolvers(pubsub) {
       undoTransaction: async (_, { id }) => {
         const originalTx = await TransactionModel.getTransactionById(id);
         if (!originalTx) throw new Error("Transaction not found");
-
+      
         const reversalTx = {
           account_id: originalTx.account_id,
           amount: -originalTx.amount,
@@ -185,16 +187,18 @@ export function createTransactionResolvers(pubsub) {
           description: `Undo transaction ${id}`,
           currency: originalTx.currency,
         };
-
+      
         const account = await AccountModel.getAccountById(originalTx.account_id);
+        // Calcular el nuevo balance; en este ejemplo, asumimos que se resta el monto original
         const newBalance = account.current_balance - originalTx.amount;
-        const createdReversalTx = await TransactionModel.createTransaction(reversalTx);
+        // IMPORTANTE: pasar newBalance como segundo argumento
+        const createdReversalTx = await TransactionModel.createTransaction(reversalTx, newBalance);
         const updatedAccount = await AccountModel.updateBalance(originalTx.account_id, {
           current_balance: newBalance,
         });
         
         const resultTx = { ...createdReversalTx, updatedBalance: updatedAccount.current_balance };
-
+      
         pubsub.publish(TRANSACTION_CHANGED, {
           transactionChanged: {
             changeType: 'UNDONE',
@@ -203,6 +207,7 @@ export function createTransactionResolvers(pubsub) {
         });
         return resultTx;
       }
+      
     },
 
     Subscription: {

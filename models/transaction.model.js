@@ -34,8 +34,13 @@ class TransactionModel {
     }
 
     static async updateTransaction(id, transaction) {
-        const { account_id, date, amount, type, description, currency } = transaction;
-        const query = 'UPDATE transactions SET account_id = $1, date = $2, amount = $3, type = $4, description = $5, currency = $6 WHERE id = $7 RETURNING *';
+        const { account_id, date, amount, type, description, currency, voided } = transaction;
+        if (voided) {
+            const query = 'UPDATE transactions SET voided = $1 WHERE id = $2 RETURNING *';
+            const response = await dbConnection.query(query, [voided, id]);
+            return response.rows[0];
+        }
+        const query = 'UPDATE transactions SET account_id = $1, date = $2, amount = $3, type = $4, description = $5, currency = $6 WHERE id = $8 RETURNING *';
         const response = await dbConnection.query(query, [account_id, date, amount, type, description, currency, id]);
         return response.rows[0];
     }
