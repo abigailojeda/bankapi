@@ -161,8 +161,7 @@ export function createTransactionResolvers(pubsub) {
 
         if (!tx.voided) {
           const account = await AccountModel.getAccountById(tx.account_id);
-          const newBalance = account.current_balance - tx.amount;
-          await AccountModel.updateBalance(tx.account_id, { current_balance: newBalance });
+          const newBalance = account.current_balance;
           const voidedTx = { ...tx, voided: true };
           await TransactionModel.updateTransaction(id, voidedTx);
           const resultTx = { ...voidedTx, updatedBalance: newBalance };
