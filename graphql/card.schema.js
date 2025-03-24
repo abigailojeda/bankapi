@@ -99,7 +99,7 @@ export function createCardResolvers(pubsub) {
         },
         Subscription: {
             cardChanged: {
-                subscribe: () => pubsub.asyncIterator(CARD_CHANGED),
+                subscribe: () => pubsub.asyncIterableIterator(CARD_CHANGED),
             },
         },
     };

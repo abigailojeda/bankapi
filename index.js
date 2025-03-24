@@ -21,7 +21,6 @@ import { createTransactionRouter } from './routes/transaction.router.js';
 import { userResolvers, userTypeDefs } from './graphql/user.schema.js';
 
 const pubsub = new PubSub();
-console.log(pubsub.asyncIterableIterator);
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -58,7 +57,7 @@ const resolvers = [
   rootResolvers,
   createTransactionResolvers(pubsub),
   createAccountResolvers(pubsub),
-  createCardResolvers,
+  createCardResolvers(pubsub),
   userResolvers
 ];
 
