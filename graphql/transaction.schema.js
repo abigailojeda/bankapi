@@ -126,22 +126,25 @@ export function createTransactionResolvers(pubsub) {
       updateTransaction: async (_, { id, accountId, amount, date, type, description, currency }) => {
         const oldTx = await TransactionModel.getTransactionById(id);
         if (!oldTx) throw new Error("Transaction not found");
-
-        const amountDiff = amount - oldTx.amount;
-
+      
+        const effectiveNewAmount = type === 'deposit' ? Number(amount) : -Number(amount);
+        const effectiveOldAmount = oldTx.type === 'deposit' ? Number(oldTx.amount) : -Number(oldTx.amount);
+        const amountDiff = effectiveNewAmount - effectiveOldAmount;
+        console.log("Effective new amount:", effectiveNewAmount, "Effective old amount:", effectiveOldAmount, "Diff:", amountDiff);
+      
         const updatedTx = await TransactionModel.updateTransaction(id, {
           account_id: accountId || oldTx.account_id,
-          amount,
+          amount: Number(amount),
           date,
           type,
           description,
           currency: currency || oldTx.currency,
         });
-
+      
         const account = await AccountModel.getAccountById(updatedTx.account_id);
         const newBalance = account.current_balance + amountDiff;
         await AccountModel.updateBalance(updatedTx.account_id, { current_balance: newBalance });
-
+      
         const resultTx = { ...updatedTx, updatedBalance: newBalance };
         pubsub.publish(TRANSACTION_CHANGED, {
           transactionChanged: {
@@ -182,6 +185,7 @@ export function createTransactionResolvers(pubsub) {
         const updatedTxData = {
           ...originalTx,
           type: 'reversal',
+          amount: originalTx.type === 'withdrawal' ? -originalTx.amount : originalTx.amount
         };
       
         const reversedTx = await TransactionModel.updateTransaction(id, updatedTxData);
