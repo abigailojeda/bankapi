@@ -16,7 +16,7 @@ export const cardTypeDefs = gql`
         card(id: ID!): Card
 
         # Devuelve todas las tarjetas de una cuenta concreta
-        cardsByAccountId(accountId: ID!): [Card!]!
+        cardsByAccountId(account_id: ID!): [Card!]!
     }
 
     type Mutation {
@@ -41,35 +41,29 @@ export const cardTypeDefs = gql`
 
 export const cardResolvers = {
     Query: {
-        // Usa el método getCards() de tu CardModel
         cards: async () => {
             return CardModel.getCards();
         },
 
-        // Usa el método getCardById(id)
         card: async (_, { id }) => {
             return CardModel.getCardById(id);
         },
 
-        // Usa el método getCardsByAccountId(accountId)
         cardsByAccountId: async (_, { accountId }) => {
             return CardModel.getCardsByAccountId(accountId);
         },
     },
  Mutation: {
-        // Usa el método createCard(card)
         createCard: async (_, { account_id, card_number }) => {
             const card = { account_id, card_number };
             return CardModel.createCard(card);
         },
 
-        // Usa el método updateCard(id, card)
         updateCard: async (_, { id, account_id, card_number }) => {
             const card = { account_id, card_number };
             return CardModel.updateCard(id, card);
         },
 
-        // Usa el método deleteCard(id)
         deleteCard: async (_, { id }) => {
             return CardModel.deleteCard(id);
         },
