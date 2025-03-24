@@ -13,7 +13,7 @@ import TransactionModel from './models/transaction.model.js';
 
 import { transactionTypeDefs, createTransactionResolvers } from './graphql/transaction.schema.js';
 import { accountTypeDefs, createAccountResolvers } from './graphql/account.schema.js';
-import { cardTypeDefs, cardResolvers } from './graphql/card.schema.js';
+import { cardTypeDefs, createCardResolvers } from './graphql/card.schema.js';
 
 import { createUserRouter } from './routes/user.router.js';
 import { createAccountRouter } from './routes/account.router.js';
@@ -58,7 +58,7 @@ const resolvers = [
   rootResolvers,
   createTransactionResolvers(pubsub),
   createAccountResolvers(pubsub),
-  cardResolvers,
+  createCardResolvers,
   userResolvers
 ];
 
